@@ -21,7 +21,7 @@ function decrypt(encryptedData) {
 const allowedIPs = [];
 
 const ipFilter = (req, res, next) => {
-    const requestIP = req.ip;
+    const requestIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress.replace('::ffff:', '');
 
     if (allowedIPs.includes(requestIP)) {
         next();
@@ -29,7 +29,6 @@ const ipFilter = (req, res, next) => {
         res.status(403).json({ message: 'Access forbidden: Your IP is not allowed' });
     }
 };
-
 app.post('/api/register', ipFilter, (req, res) => {
     try {
         const { data } = req.body;
