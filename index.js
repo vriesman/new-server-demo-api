@@ -30,7 +30,7 @@ const ipFilter = (req, res, next) => {
     }
 };
 
-app.post('/api/register', ipFilter, (req, res) => {
+app.post('/api/resgister', ipFilter, (req, res) => {
     try {
         const { data } = req.body;
 
