@@ -4,6 +4,7 @@ import cors from "cors";
 import TelegramBot from 'node-telegram-bot-api';
 import axios from "axios";
 import CryptoJS from "crypto-js";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 app.use(cors('*'));
@@ -18,20 +19,27 @@ function decrypt(encryptedData) {
     return decrypted;
 }
 
-const allowedIPs = [process.env.IP];
-
 const ipFilter = (req, res, next) => {
-    const requestIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress.replace('::ffff:', '');
+    const { data } = req.body;
+    const decryptedData = decrypt(data);
+    const values = JSON.parse(decryptedData);
+    const token = values?.token;
 
-    console.log(requestIP);
-
-    if (allowedIPs.includes(requestIP)) {
-        next();
-    } else {
+    if (token !== process.env.TOKEN) {
         res.status(403).json({ message: 'Access forbidden: Your IP is not allowed' });
+    } else {
+        next();
     }
 };
-app.post('/api/register', ipFilter, (req, res) => {
+
+const registerLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 3,
+    message: 'Access forbidden: Too Many Requests',
+    headers: true,
+});
+
+app.post('/api/register',registerLimiter, ipFilter, (req, res) => {
     try {
         const { data } = req.body;
 
@@ -65,7 +73,7 @@ app.post('/api/register', ipFilter, (req, res) => {
                 .then(response => {
                     bot.sendMessage(process.env.CHAT_ID, '✅ Thêm dữ liệu vào Sheet thành công.');
                 })
-                .catch(error => {
+                .catch(err => {
                     bot.sendMessage(process.env.CHAT_ID, 'Thêm vào Google Sheet không thành công, liên hệ <code>@otisth</code>',  { parse_mode: 'html' });
                 });
         }
