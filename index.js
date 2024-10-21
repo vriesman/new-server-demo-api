@@ -18,10 +18,12 @@ function decrypt(encryptedData) {
     return decrypted;
 }
 
-const allowedIPs = [];
+const allowedIPs = [process.env.IP];
 
 const ipFilter = (req, res, next) => {
     const requestIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress.replace('::ffff:', '');
+
+    console.log(requestIP);
 
     if (allowedIPs.includes(requestIP)) {
         next();
