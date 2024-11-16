@@ -33,7 +33,7 @@ const ipFilter = (req, res, next) => {
 };
 
 const registerLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 1 giờ
+    windowMs: 15 * 60 * 1000, 
     max: 10, 
     message: 'Access forbidden: Too Many Requests',
     headers: true,
